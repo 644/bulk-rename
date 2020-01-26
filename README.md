@@ -1,5 +1,5 @@
 # About
-This is just an experimental script, to test quicksort recursion in bash for bulk renaming.
+This is just an experimental script to test quicksort recursion in bash for bulk renaming.
 
 Do not use this if you care about performance. Instead use the below snippet.
 
