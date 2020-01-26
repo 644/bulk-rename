@@ -1,5 +1,5 @@
 # About
-This is just an experimental script to test quicksort recursion in bash for bulk renaming.
+This is just an experimental script to test quicksort recursion in bash for bulk renaming. However, the bulk-rename-array script is surprisingly *only* 2x slower than the below snippet per 10,000 folders, and it replaces for file/folder names that rename can't.
 
 Do not use this if you care about performance. Instead use the below snippet.
 
