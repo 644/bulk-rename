@@ -1,0 +1,37 @@
+#!/bin/bash
+set -euo pipefail
+
+fnd=' '; rpl='_'; dir=${1-${PWD}}
+
+[[ ! -d ${dir} || ! -O ${dir} ]] && printf 'error with %q\n' "${dir}" >&2 && exit 1
+[[ ${dir:0:1} != '/' ]] && dir=./${dir}
+cd -- "${dir}"
+
+shopt -s globstar dotglob nullglob
+declare -A depth=()
+for fd in ./**/*"${fnd}"*; do
+	if [[ -d "${fd}" ]]; then
+		count=${fd//[^\/]}
+		depth["${#count}"]+="fol=${fd}\0"
+	elif [[ -f "${fd}" ]]; then
+		fname=${fd##*/}
+		fpath=${fd%/*}
+		newf=${fpath}/${fname//${fnd}/${rpl}}
+		[[ -e "${newf}" ]] && printf '%q already exists.. quitting\n' "${newf}" >&2 && exit 1
+		mv -- "${fd}" "${newf}"
+	fi
+done
+
+for d in "${depth[@]}"; do
+	while IFS= read -r -d '' fol; do
+		var=${fol%%=*}
+		value=${fol#*=}
+		printf -v "${var}" %s "${value}"
+		fol=${!var}
+		dname=${fol##*/}
+		dpath=${fol%/*}
+		newd=${dpath}/${dname//${fnd}/${rpl}}
+		[[ -e "${newd}" ]] && printf '%q already exists.. quitting\n' "${newd}" >&2 && exit 1
+		mv -- "${fol}" "${newd}"
+	done < <(echo -e "${d}")
+done
