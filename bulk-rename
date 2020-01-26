@@ -1,0 +1,43 @@
+#!/bin/bash
+set -euo pipefail
+
+fnd=' '; rpl='_'; dir=${1-${PWD}}
+
+[[ ! -d ${dir} ]] && printf '%q not a directory\n' "${dir}" >&2 && exit
+[[ ${dir:0:1} != '/' ]] && dir=./${dir}
+cd -- "${dir}"
+
+function qsort(){
+	local i p sml=() lrg=()
+	qsort_res=()
+	(($#)) || return 0
+	p=${1}; shift
+	for i; do ((${p%% *} < ${i%% *})) && sml+=("${i}") || lrg+=("${i}"); done
+	qsort "${sml[@]}"; sml=("${qsort_res[@]}")
+	qsort "${lrg[@]}"; lrg=("${qsort_res[@]}")
+	qsort_res=("${sml[@]}" "${p#* }" "${lrg[@]}")
+}
+
+shopt -s globstar dotglob nullglob
+depth=()
+for fd in ./**/*"${fnd}"*; do
+	if [[ -d "${fd}" ]]; then
+		count=${fd//[^\/]}
+		depth+=("${#count} ${fd}")
+	elif [[ -f "${fd}" ]]; then
+		fname=${fd##*/}
+		fpath=${fd%/*}
+		newf=${fpath}/${fname//${fnd}/${rpl}}
+		mv -- "${fd}" "${newf}"
+	fi
+done
+
+qsort "${depth[@]}"
+declare qsort_res
+
+for d in "${qsort_res[@]}"; do
+	dname=${d##*/}
+	dpath=${d%/*}
+	newd=${dpath}/${dname//${fnd}/${rpl}}
+	[[ ! -e "${newd}" ]] && mv -- "${d}" "${newd}"
+done
