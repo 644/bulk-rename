@@ -3,7 +3,7 @@ set -euo pipefail
 
 fnd=' '; rpl='_'; dir=${1-${PWD}}
 
-[[ ! -d ${dir} ]] && printf '%q not a directory\n' "${dir}" >&2 && exit
+[[ ! -d ${dir} || ! -O ${dir} ]] && printf 'error with %q\n' "${dir}" >&2 && exit
 [[ ${dir:0:1} != '/' ]] && dir=./${dir}
 cd -- "${dir}"
 
