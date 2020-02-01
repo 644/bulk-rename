@@ -1,5 +1,5 @@
 # About
-This a replacement script for things like the below snippet. The bulk-rename script is surprisingly faster than the below snippet in *some* cases, and it replaces for file/folder names that rename can't. It's only slower when there's lots of nested directories within nested directories, but not by much. Also since it's pure bash, it will work on any system that has just bash >4.0+ installed. bulk-rename-qsort is entirely experimental, and is much slower than both.
+This is a replacement script for things like the below snippet. The bulk-rename script is surprisingly faster than the below snippet in *some* cases, and it replaces for file/folder names that rename can't. It's only slower when there's lots of nested directories within nested directories, but not by much. Also since it's pure bash, it will work on any system that has just bash >4.0+ installed. bulk-rename-qsort is entirely experimental, and is much slower than both.
 
 Do not use this if you care about performance. Instead use the below snippet.
 
