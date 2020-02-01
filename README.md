@@ -1,5 +1,5 @@
 # About
-This is just an experimental script to test quicksort recursion in bash for bulk renaming. However, the bulk-rename-array script is surprisingly *only a constant of 2 times* slower than the below snippet; 10,000 folders takes rename ~7s and bulk-rename-array ~14s; 30,000 folders takes rename ~20s and bulk-rename-array ~40s, and it replaces for file/folder names that rename can't. Also since it's pure bash, it will work on any system that has just bash > 4.0+ installed.
+This is just an experimental script to test bash for bulk file/folder renaming. However, the bulk-rename-array script is surprisingly faster than the below snippet in *some* cases, and it replaces for file/folder names that rename can't. It's only slower when there's lots of nested directories within nested directories. Also since it's pure bash, it will work on any system that has just bash >4.0+ installed.
 
 Do not use this if you care about performance. Instead use the below snippet.
 
