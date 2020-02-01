@@ -2,9 +2,9 @@
 set -euo pipefail
 shopt -s globstar dotglob nullglob
 
-fnd=' '; rpl='_'; dir=${1-${PWD}}
+fnd='_'; rpl=' '; dir=${1-${PWD}}
 folderlist=(); folsorted=()
-maxdepth=0; pos=0
+maxdepth=0; moved=0; pos=0
 
 [[ ! -d ${dir} || ! -O ${dir} ]] && printf 'error with %q\n' "${dir}" >&2 && exit 1
 [[ ${dir:0:1} != '/' ]] && dir=./${dir}
@@ -12,11 +12,12 @@ cd -- "${dir}"
 
 for fd in ./**/*"${fnd}"*; do
 	if [[ -f ${fd} && -O ${fd} ]]; then
+		((++moved >= 500)) && wait && moved=0
 		fname=${fd##*/}
 		fpath=${fd%/*}
 		newf=${fpath}/${fname//${fnd}/${rpl}}
 		[[ -e ${newf} ]] && printf '%q already exists.. quitting\n' "${newf}" >&2 && exit 1
-		mv -- "${fd}" "${newf}"
+		mv -- "${fd}" "${newf}" &
 	elif [[ -d ${fd} && -O ${fd}/.. ]]; then
 		folderlist+=("${fd}")
 		slashc=${fd//[^\/]}
@@ -31,10 +32,12 @@ for fol in "${folderlist[@]}"; do
 	folsorted[${offset}]=${fol}
 done
 
+moved=0
 for fol in "${folsorted[@]}"; do
+	((++moved >= 500)) && wait && moved=0
 	dname=${fol##*/}
 	dpath=${fol%/*}
 	newd=${dpath}/${dname//${fnd}/${rpl}}
 	[[ -e "${newd}" ]] && printf '%q already exists.. quitting\n' "${newd}" >&2 && exit 1
-	mv -- "${fol}" "${newd}"
+	mv -- "${fol}" "${newd}" &
 done
