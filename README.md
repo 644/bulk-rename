@@ -15,7 +15,7 @@ fnd=' '; rpl='_'; dir=${1-${PWD}}
 find "${dir}" -depth -type f,d -name '* *' -exec rename "${fnd}" "${rpl}" '{}' \;
 ```
 # Dependencies
-Bash > 4.0+
+Bash >4.0+
 
 # License
 MIT
