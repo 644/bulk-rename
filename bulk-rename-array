@@ -2,7 +2,7 @@
 set -euo pipefail
 shopt -s globstar dotglob nullglob
 
-fnd='_'; rpl=' '; dir=${1-${PWD}}
+fnd=' '; rpl='_'; dir=${1-${PWD}}
 folderlist=(); folsorted=()
 maxdepth=0; moved=0; pos=0
 
@@ -28,7 +28,7 @@ done
 foldercount=${#folderlist[@]}
 for fol in "${folderlist[@]}"; do
 	slashc=${fol//[^\/]}
-	((offset = (maxdepth - ${#slashc}) * foldercount + pos++))
+	((offset = (maxdepth - ${#slashc}) * foldercount + ++pos))
 	folsorted[${offset}]=${fol}
 done
 
