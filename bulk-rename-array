@@ -4,36 +4,37 @@ shopt -s globstar dotglob nullglob
 
 fnd=' '; rpl='_'; dir=${1-${PWD}}
 folderlist=(); folsorted=()
-foldercount=0; pos=0
+maxdepth=0; pos=0
 
 [[ ! -d ${dir} || ! -O ${dir} ]] && printf 'error with %q\n' "${dir}" >&2 && exit 1
 [[ ${dir:0:1} != '/' ]] && dir=./${dir}
 cd -- "${dir}"
 
 for fd in ./**/*"${fnd}"*; do
-	if [[ -f ${fd} ]]; then
+	if [[ -f ${fd} && -O ${fd} ]]; then
 		fname=${fd##*/}
 		fpath=${fd%/*}
 		newf=${fpath}/${fname//${fnd}/${rpl}}
-		[[ -e "${newf}" ]] && printf '%q already exists.. quitting\n' "${newf}" >&2 && exit 1
+		[[ -e ${newf} ]] && printf '%q already exists.. quitting\n' "${newf}" >&2 && exit 1
 		mv -- "${fd}" "${newf}"
-	elif [[ -d ${fd} ]]; then
-		((++foldercount))
+	elif [[ -d ${fd} && -O ${fd}/.. ]]; then
 		folderlist+=("${fd}")
+		slashc=${fd//[^\/]}
+		((${#slashc} > maxdepth)) && maxdepth=${#slashc}
 	fi
 done
 
+foldercount=${#folderlist[@]}
 for fol in "${folderlist[@]}"; do
 	slashc=${fol//[^\/]}
-	offset=$((${#slashc} * foldercount + pos++))
+	((offset = (maxdepth - ${#slashc}) * foldercount + pos++))
 	folsorted[${offset}]=${fol}
 done
 
 for fol in "${folsorted[@]}"; do
 	dname=${fol##*/}
 	dpath=${fol%/*}
-	curd=${dpath//${fnd}/${rpl}}/${dname}
-	newd=${fol//${fnd}/${rpl}}
+	newd=${dpath}/${dname//${fnd}/${rpl}}
 	[[ -e "${newd}" ]] && printf '%q already exists.. quitting\n' "${newd}" >&2 && exit 1
-	mv -- "${curd}" "${newd}"
+	mv -- "${fol}" "${newd}"
 done
